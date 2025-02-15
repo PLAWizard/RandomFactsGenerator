@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Random Fact Generator</title>
+  <title>Random Fact & Word Generator</title>
   <style>
     /* General Styles */
     body {
@@ -33,7 +33,7 @@
       font-size: 2em;
     }
 
-    #fact {
+    #output {
       font-size: 1.2em;
       margin-bottom: 20px;
       color: #555;
@@ -41,6 +41,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
     }
 
     button {
@@ -88,14 +95,17 @@
 </head>
 <body>
   <div class="container">
-    <h1>Random Fact Generator</h1>
-    <p id="fact">Click the button to get a random fact!</p>
+    <h1>Random Fact & Word Generator</h1>
+    <div id="output">Click a button to generate a fact or word!</div>
     <div class="loader" id="loader"></div>
-    <button id="generate-btn">Generate Fact</button>
+    <div class="buttons">
+      <button id="fact-btn">Generate Fact</button>
+      <button id="word-btn">Generate Word</button>
+    </div>
   </div>
 
   <script>
-    // Array of facts (all the facts you provided)
+    // Array of facts
     const facts = [
       "There are more trees on earth than stars in the Milky Way galaxy.",
       "German Chocolate Cake has nothing to do with Germany. It was named after English-American Samuel German who developed a formulation of dark baking chocolate that came to be used in the cake recipe.",
@@ -190,31 +200,99 @@
       "Most of the visible stars you see in the night sky are binary stars - two stars orbiting each other."
     ];
 
-    // Function to generate a random fact
-    function generateRandomFact() {
-      const factElement = document.getElementById('fact');
-      const loader = document.getElementById('loader');
-      const button = document.getElementById('generate-btn');
+    // Array of words
+    const words = [
+      "paddle", "psychologist", "sack", "hospital", "weariness", "conifer", "standby", "spectator", "exodus", "laughable",
+      "wheelchair", "hush", "cracked", "round", "coin", "usable", "weight", "game", "double-edged", "decree",
+      "mire", "supersonic", "unmanned", "chile", "scheme", "gentle", "railing", "translator", "cold", "tolerate",
+      "servant", "differ", "inspection", "secretary-general", "extracurricular", "frustration", "blood", "forbidden",
+      "template", "dementia", "euphemism", "telling", "returning", "bacteria", "impoverished", "superintendent", "tube",
+      "helmet", "clothing", "incompetent", "fool", "holy", "catfish", "mousse", "gesture", "powerhouse", "overtone",
+      "exhibit", "gunman", "chopped", "addictive", "sheer", "scorch", "hunk", "squirrel", "press", "premium", "black",
+      "polygraph", "housekeeping", "martial", "raise", "proportional", "pelvic", "sociologist", "ivory", "squirt",
+      "concerned", "disposal", "horrify", "soloist", "provocative", "low-income", "illusory", "incentive", "smack",
+      "swivel", "cloak", "lineman", "warming", "dotted", "repressive", "unhealthy", "exercise", "hallowed", "muddy",
+      "effortless", "epilepsy", "self-control", "melodrama", "pox", "stylish", "stop", "backup", "venom", "musty",
+      "unparalleled", "stipend", "validate", "forecaster", "contribution", "voodoo", "minimum", "center", "stroke",
+      "wallow", "payout", "anti-communist", "stretch", "domesticated", "tamale", "grocer", "qualitative", "lopsided",
+      "decipher", "craftsmanship", "experimental", "consolidation", "shelter", "revere", "japanese", "hybrid", "laden",
+      "appendix", "tramp", "leeway", "tape", "amorous", "drawback", "kennel", "tender", "aware", "chuckle", "fake",
+      "pace", "muted", "choice", "spiral", "defined", "name", "inaugural", "enjoy", "rid", "engineered", "heartless",
+      "gory", "healer", "vacuum", "steeple", "cayenne", "bathe", "maternity", "rapist", "reddish", "dishonesty", "fab",
+      "rented", "clash", "seal", "quake", "carry", "smudge", "traditional", "pennant", "succulent", "inference",
+      "longtime", "shipment", "media", "hill", "leakage", "excavation", "demonstrate", "applaud", "following", "despair",
+      "vessel", "deforestation", "rim", "comma", "journey", "unbiased", "span", "footing", "fellow", "prelude", "somali",
+      "dispel", "wreak", "rankportend", "editing", "infrastructure", "lanky", "staccato", "infusion", "predation",
+      "overthrow", "spinner", "arena", "tab", "terrestrial", "learner", "franchise", "inject", "prepaid", "district",
+      "tango", "alligator", "questionnaire", "cholesterol", "perch", "stipend", "co-star", "revolutionary", "detriment",
+      "hacker", "entertainment", "pagan", "scope", "betrayal", "contradictory", "help", "pocketbook", "light",
+      "ineffectual", "sojourn", "growl", "sandal", "number", "dice", "caviar", "postgraduate", "redundant", "misguided",
+      "construe", "hangover", "decay", "casing", "corporation", "navigation", "smash", "academic", "striking", "yen",
+      "koran", "modernization", "quandary", "forum", "lively", "direct", "convoy", "twirl", "child", "brother-in-law",
+      "scribe", "nation-state", "cite", "armenian", "plod", "real-world", "internment", "patty", "blinding", "synchronize",
+      "supernatural", "characterization", "formulation", "contrary", "screener", "furious", "porch", "husband", "padded",
+      "rationing", "swell", "photograph", "matter", "reproduce", "bibliography", "trauma", "typewriter", "indigenous",
+      "blackboard", "spot", "hardwood", "guidance", "shifter", "micro", "unbridled", "score", "ultraviolet", "useful",
+      "negligence", "shallot", "perceptive", "scalpel", "ponder", "chilean", "footnote", "regress", "shallow", "inflated",
+      "eliminate", "rustle", "arch", "climb", "prolonged", "cubic", "pope", "multimillion-dollar", "caring", "doorman",
+      "militiaman", "baguette", "widening", "shameful", "assemble", "demolish", "vacant", "label", "cross-country", "fridge",
+      "mammalian", "consist", "coolness", "flawed", "sieve", "memoir", "branch", "high-pressure", "punch", "lymph", "scoop",
+      "peck", "limousine", "pray", "bomb", "splendid", "cover", "pamper", "freezing", "animosity", "litigate", "guaranteed",
+      "attractive", "retrospective", "humanity", "understand", "foe", "cove", "rope", "partisanship", "tidbit", "subway",
+      "first-degree", "shower", "illegal", "trafficking", "embolden", "deliverance", "hat", "marathon", "ski", "impact",
+      "oppositional", "kerosene", "likely", "cardboard", "listening", "destitute", "caseworker", "cereal", "helium",
+      "readout", "gray", "opening", "white-haired", "drizzle", "varsity", "one-dimensional", "fingernail", "butterfly",
+      "perpetrate", "idyllic", "endeavor", "constrain", "gift", "grow", "standout", "windswept", "big-city", "piping",
+      "orchestra", "cocktail", "said", "urchin", "climax", "peacemaker", "sleeping", "wavelength", "skiff", "offset",
+      "interfere", "inaction", "clearing", "catholic", "deviant", "suffering", "convertible", "latch", "convincing", "folly",
+      "algae", "animation", "borrowed", "reconstructive", "looter", "missile", "making", "relive", "publicize", "snowboard",
+      "outsource", "retiree", "unimportant", "flip", "backlash", "enrich", "carriage", "ornament", "sever", "blind", "ocean",
+      "aspiring", "symbolic", "protest", "adrenaline", "conserve", "domesticated", "idol", "espresso", "contracting",
+      "academic", "latency", "rubble", "high-level", "vindictive", "congress", "at-bat", "shipyard", "investment", "volcano",
+      "prune", "consultation", "distil", "friction", "deficiency", "cove", "consortium", "iranian", "legion", "mood", "jumping",
+      "behavioral", "raspberry", "closed", "baroque", "offer", "waste", "hefty", "public", "prophecy", "spout", "churn",
+      "ambassador", "unrecognizable", "two-story", "synthesize", "occur", "formulate", "brag", "refined", "aegis", "centrist",
+      "devastated", "defuse", "scan", "hood", "ownership", "controversy", "degenerate", "racetrack", "combustion", "anova",
+      "cohesion", "prime-time", "disagreement", "campaign", "drink", "jeans", "hormone", "helpless", "graph", "ruddy", "vote",
+      "heft", "flexible", "autograph", "evolve", "reliability", "franchisee", "iced", "leak", "messaging", "imagery", "hoot",
+      "right-wing", "bridge", "confront", "pre-existing", "pocket", "scenery", "compound", "centralize", "filthy", "head",
+      "silhouette", "audacity", "thud", "disgrace", "humility", "podium", "sing", "infidel", "complacency", "imam", "ice",
+      "lebanese", "tangled", "eligibility", "midweek", "namesake", "step-by-step", "concept", "fleshy", "fathom", "stud",
+      "graphic", "dispose", "implied", "discretionary", "arcade", "dig", "faceless", "disinterested", "gravitational", "defunct",
+      "reread", "grape", "veil", "incapable", "con", "reside", "redwood", "nesting", "supplement", "franchise", "narration",
+      "medieval", "purify", "gurney", "persecution", "notation", "harsh", "iraqi", "busy", "complete", "dancing", "sole", "nude",
+      "volatile", "nourish", "mastectomy", "realistic", "croissant", "abundance", "insulated", "undue", "riverbank"
+    ];
 
-      // Show loader and disable button
+    // Function to generate a random fact or word
+    function generateRandom(type) {
+      const outputElement = document.getElementById('output');
+      const loader = document.getElementById('loader');
+
+      // Show loader and clear output
       loader.style.display = 'block';
-      factElement.textContent = '';
-      button.disabled = true;
+      outputElement.textContent = '';
 
       // Simulate a delay (like fetching from an API)
       setTimeout(() => {
-        // Pick a random fact
-        const randomFact = facts[Math.floor(Math.random() * facts.length)];
-        factElement.textContent = randomFact;
+        let result;
+        if (type === 'fact') {
+          result = facts[Math.floor(Math.random() * facts.length)];
+        } else if (type === 'word') {
+          result = words[Math.floor(Math.random() * words.length)];
+        }
 
-        // Hide loader and enable button
+        // Display the result
+        outputElement.textContent = result;
+
+        // Hide loader
         loader.style.display = 'none';
-        button.disabled = false;
       }, 500); // Simulate a 0.5-second delay
     }
 
-    // Add event listener to the button
-    document.getElementById('generate-btn').addEventListener('click', generateRandomFact);
+    // Add event listeners to the buttons
+    document.getElementById('fact-btn').addEventListener('click', () => generateRandom('fact'));
+    document.getElementById('word-btn').addEventListener('click', () => generateRandom('word'));
   </script>
 </body>
 </html>
