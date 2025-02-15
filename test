@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Random Fact & Word Generator</title>
+  <style>
+    /* General Styles */
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #1a1a2e, #16213e); /* Dark blue gradient */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      color: #e0e0e0; /* Light gray text for contrast */
+    }
+
+    .container {
+      background-color: #0f3460; /* Deep blue container */
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+      animation: fadeIn 1s ease-in;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #e94560; /* Vibrant pink for the title */
+      font-size: 2em;
+    }
+
+    #output {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+      color: #e0e0e0; /* Light gray text */
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #16213e; /* Dark blue background for output */
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #1a1a2e; /* Subtle border */
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #e94560; /* Vibrant pink for buttons */
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #d63447; /* Darker pink on hover */
+      transform: scale(1.05);
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+
+    /* Loading Spinner */
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #e94560; /* Vibrant pink spinner */
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+      display: none;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Random Fact & Word Generator</h1>
+    <div id="output">Click a button to generate a fact or word!</div>
+    <div class="loader" id="loader"></div>
+    <div class="buttons">
+      <button id="fact-btn">Generate Fact</button>
+      <button id="word-btn">Generate Word</button>
+    </div>
+  </div>
+
+  <script>
+    // Array of facts
+    const facts = [
+      "There are more trees on earth than stars in the Milky Way galaxy.",
+      "German Chocolate Cake has nothing to do with Germany. It was named after English-American Samuel German who developed a formulation of dark baking chocolate that came to be used in the cake recipe.",
+      "In 1919, a wave of molasses rushed through the streets of Boston killing 21 people and injuring 150.",
+      "On average, the closest planet to Earth is Mercury. On average, the closest planet to Pluto is also Mercury.",
+      "The fortune cookie was likely invented in the US by people of Japanese descent.",
+      "The founder of Match.com, Gary Kremen, lost his girlfriend to another man she met on Match.com.",
+      "Jupiter has over 70 moons.",
+      "Alaska is the most northern, eastern, and western state in the USA.",
+      "Firefighters sometimes use wetting agents to make water wetter.",
+      "A Georgia teacher who bought a $400 travel insurance policy was rewarded $10,000 because she read the fine print of the contract.",
+      "Scotland has over 400 words for 'snow'.",
+      "The eighth power of a number is a zenzizenzizenzic.",
+      "Smallpox is the only infectious disease that affects humans to have been eradicated.",
+      "If sound could travel through space, the noise that the sun would be the equivalent to a train horn from 1 meter away.",
+      "Camels originated in North America.",
+      "Because there are more molecules of air in one breath than there are breaths in the atmosphere, every breath you take likely contains at least one molecule of Newton’s last breath.",
+      "Sharks have no bones.",
+      "The national animal of Scotland is the unicorn.",
+      "The chainsaw was originally created to aid in childbirth.",
+      "A giraffe and a human have the same number of bones in their necks.",
+      "One teaspoon of neutron star material weighs six billion tons.",
+      "Mark Twain was born on the same day Halley’s Comet flew by the earth. He said, 'I came in with Halley’s Comet in 1835. It is coming again next year, and I expect to go out with it.' Halley’s Comet appeared on April 21, 1910, which is the day Mark Twain died.",
+      "Canada's forests make up nearly 9% of the world’s total forest area.",
+      "Hot water freezes faster than cold water.",
+      "You could fit all the planets between the Earth and the moon.",
+      "McDonald’s once made bubblegum-flavored broccoli.",
+      "In a room with just 23 people, there’s a 50-50 chance that at least two people have the same birthday.",
+      "Broccoli, Brussels sprouts, cabbage, cauliflower, collard greens, gai lan, kale, kohlrabi, and savoy are all the same species of plant called 'Brassica oleracea'.",
+      "The couple in the painting 'American Gothic' are actually father and daughter and not husband and wife.",
+      "The Canary Islands were named after dogs, not canaries.",
+      "Bubbles are the number one cause of damage to ship propellers.",
+      "There are only two countries in the world that have 'The' as part of their country's name.",
+      "“Military Grade” is a marketing ploy. In the actual military, 'military grade' is defined as 'meeting the bare-minimum requirements of durability, while also costing the least.'",
+      "There are different sizes of infinity.",
+      "More photos were taken in the past seven years than in all of the previous history.",
+      "If a Lone Star Tick bites you, you may become allergic to red meat.",
+      "Due to their fur, the polar bear is relatively 'invisible' to an infrared camera.",
+      "The longest boxing match went 110 rounds and over 7 hours.",
+      "It's suspected that on Neptune and Uranus, it rains diamonds.",
+      "Australia once lost a war to emus (the birds).",
+      "Most people have an above-average number of arms.",
+      "Earth used to be purple.",
+      "In 1961, two hydrogen bombs were accidentally dropped over North Carolina. A glitch prevented them from detonating.",
+      "Twinkies only have a shelf life of 45 days.",
+      "If the sun dies, it'll take about 8 minutes before we realize it has.",
+      "You have no major muscles in your fingers. All muscles that control finger movement are in your forearm and palm.",
+      "A town in Pennsylvania has had an uncontrolled fire burning since 1962.",
+      "Nintendo has existed as a company since 1889.",
+      "Lemurs use millipedes as an insect repellant and to get high.",
+      "Red, green, yellow, and orange bell peppers are all the same type of pepper with their color difference being caused by being at different stages of ripeness.",
+      "People living in the southern hemisphere see the moon upside down compared to people living in the northern hemisphere.",
+      "There was a proposed Amendment to the US Constitution in 1916 that would put all acts of war to a national vote, and anyone voting yes would have to register as a volunteer for service in the United States Army.",
+      "There are more public libraries in the US than Starbucks or McDonald's.",
+      "A woodpecker's tongue wraps around its brain.",
+      "Drinking too much water can be fatal.",
+      "During World War 2, the US created a bomb that used live bats.",
+      "A Japanese company gives its non-smoking employees 6 extra vacation days to compensate for smoking breaks.",
+      "NASA mistakenly erased the original tape of the first steps on the moon.",
+      "In space, you don't need welding materials to get two metals to fuse. They will do it on their own if you place them close enough together.",
+      "A dog named Duke was the mayor of Cormorant, Minnesota for four consecutive terms before retiring at 91 in dog years.",
+      "Cosmic Latte is the average color of the universe.",
+      "Square watermelons are grown in Japan.",
+      "Kermit Roosevelt, Theodore Roosevelt’s grandson, overthrew Iran for the US government.",
+      "A chicken named Mike lived for 18 months after its head was chopped off.",
+      "George Washington never knew dinosaurs existed.",
+      "If you could fold a piece of paper in half 42 times, it would reach the moon.",
+      "There's a real music piece named 4′33″ that involves all the musicians just silently holding their instruments.",
+      "Tommy Fitzpatrick stole a small plane in 1956 from New Jersey on a bet and then landed it on the narrow street in front of the bar where he had been drinking in Manhattan. Two years later, he did it again after someone didn't believe he had done it the first time.",
+      "Orcas are a natural predator to moose.",
+      "15% of all public corporations in the United States use a drab two-story office space in Delaware as their tax haven, including half of all Fortune 500 companies.",
+      "You don't need to wait 24 hours to file a missing person report.",
+      "More than eighty percent of the Earth's ocean is unmapped, unobserved, and unexplored.",
+      "While Mount Everest is the highest altitude mountain, the tallest mountain on earth is Mauna Kea.",
+      "A day on Venus lasts longer than a year on Venus.",
+      "Babies have 300 bones when born while an adult only has 206 bones.",
+      "Sharks lived on earth before trees.",
+      "It's legal for anyone over 5 years old to drink alcohol in the UK.",
+      "Ancient Romans used urine as mouthwash.",
+      "There is a part of Yellowstone National Park where a person could theoretically get away with murder due to a loophole.",
+      "When a person gets a kidney transplant, they usually just leave the original kidneys in their body and put the 3rd kidney in the lower abdomen.",
+      "90% of the world's population lives in the Northern Hemisphere.",
+      "Australia exports sand to Saudi Arabia.",
+      "The smallest park in the world is a circle in a street 2 feet across.",
+      "Cows have best friends and they get stressed when they are separated.",
+      "The Brontosaurus never existed.",
+      "There are only two countries in the world that use the color purple in their flag.",
+      "The phrase 'hands down' comes from horseracing. It refers to a jockey who's so far ahead that he can afford to drop his hands and loosen the reins (usually kept tight to encourage a horse to run) and still easily win.",
+      "Maine is the closest state to Africa.",
+      "Wombat poop is square.",
+      "Oxford University is older than the Aztec Empire.",
+      "Most of the visible stars you see in the night sky are binary stars - two stars orbiting each other."
+    ];
+
+    // Array of words
+    const words = [
+      "paddle", "psychologist", "sack", "hospital", "weariness", "conifer", "standby", "spectator", "exodus", "laughable",
+      "wheelchair", "hush", "cracked", "round", "coin", "usable", "weight", "game", "double-edged", "decree",
+      "mire", "supersonic", "unmanned", "chile", "scheme", "gentle", "railing", "translator", "cold", "tolerate",
+      "servant", "differ", "inspection", "secretary-general", "extracurricular", "frustration", "blood", "forbidden",
+      "template", "dementia", "euphemism", "telling", "returning", "bacteria", "impoverished", "superintendent", "tube",
+      "helmet", "clothing", "incompetent", "fool", "holy", "catfish", "mousse", "gesture", "powerhouse", "overtone",
+      "exhibit", "gunman", "chopped", "addictive", "sheer", "scorch", "hunk", "squirrel", "press", "premium", "black",
+      "polygraph", "housekeeping", "martial", "raise", "proportional", "pelvic", "sociologist", "ivory", "squirt",
+      "concerned", "disposal", "horrify", "soloist", "provocative", "low-income", "illusory", "incentive", "smack",
+      "swivel", "cloak", "lineman", "warming", "dotted", "repressive", "unhealthy", "exercise", "hallowed", "muddy",
+      "effortless", "epilepsy", "self-control", "melodrama", "pox", "stylish", "stop", "backup", "venom", "musty",
+      "unparalleled", "stipend", "validate", "forecaster", "contribution", "voodoo", "minimum", "center", "stroke",
+      "wallow", "payout", "anti-communist", "stretch", "domesticated", "tamale", "grocer", "qualitative", "lopsided",
+      "decipher", "craftsmanship", "experimental", "consolidation", "shelter", "revere", "japanese", "hybrid", "laden",
+      "appendix", "tramp", "leeway", "tape", "amorous", "drawback", "kennel", "tender", "aware", "chuckle", "fake",
+      "pace", "muted", "choice", "spiral", "defined", "name", "inaugural", "enjoy", "rid", "engineered", "heartless",
+      "gory", "healer", "vacuum", "steeple", "cayenne", "bathe", "maternity", "rapist", "reddish", "dishonesty", "fab",
+      "rented", "clash", "seal", "quake", "carry", "smudge", "traditional", "pennant", "succulent", "inference",
+      "longtime", "shipment", "media", "hill", "leakage", "excavation", "demonstrate", "applaud", "following", "despair",
+      "vessel", "deforestation", "rim", "comma", "journey", "unbiased", "span", "footing", "fellow", "prelude", "somali",
+      "dispel", "wreak", "rankportend", "editing", "infrastructure", "lanky", "staccato", "infusion", "predation",
+      "overthrow", "spinner", "arena", "tab", "terrestrial", "learner", "franchise", "inject", "prepaid", "district",
+      "tango", "alligator", "questionnaire", "cholesterol", "perch", "stipend", "co-star", "revolutionary", "detriment",
+      "hacker", "entertainment", "pagan", "scope", "betrayal", "contradictory", "help", "pocketbook", "light",
+      "ineffectual", "sojourn", "growl", "sandal", "number", "dice", "caviar", "postgraduate", "redundant", "misguided",
+      "construe", "hangover", "decay", "casing", "corporation", "navigation", "smash", "academic", "striking", "yen",
+      "koran", "modernization", "quandary", "forum", "lively", "direct", "convoy", "twirl", "child", "brother-in-law",
+      "scribe", "nation-state", "cite", "armenian", "plod", "real-world", "internment", "patty", "blinding", "synchronize",
+      "supernatural", "characterization", "formulation", "contrary", "screener", "furious", "porch", "husband", "padded",
+      "rationing", "swell", "photograph", "matter", "reproduce", "bibliography", "trauma", "typewriter", "indigenous",
+      "blackboard", "spot", "hardwood", "guidance", "shifter", "micro", "unbridled", "score", "ultraviolet", "useful",
+      "negligence", "shallot", "perceptive", "scalpel", "ponder", "chilean", "footnote", "regress", "shallow", "inflated",
+      "arch", "climb", "prolonged", "cubic", "pope", "multimillion-dollar", "caring", "doorman",
+      "militiaman", "baguette", "widening", "shameful", "assemble", "demolish", "vacant", "label", "cross-country", "fridge",
+      "mammalian", "consist", "coolness", "flawed", "sieve", "memoir", "branch", "high-pressure", "punch", "lymph", "scoop",
+      "peck", "limousine", "pray", "bomb", "splendid", "cover", "pamper", "freezing", "animosity", "litigate", "guaranteed",
+      "attractive", "retrospective", "humanity", "understand", "foe", "cove", "rope", "partisanship", "tidbit", "subway",
+      "first-degree", "shower", "illegal", "trafficking", "embolden", "deliverance", "hat", "marathon", "ski", "impact",
+      "oppositional", "kerosene", "likely", "cardboard", "listening", "destitute", "caseworker", "cereal", "helium",
+      "readout", "gray", "opening", "white-haired", "drizzle", "varsity", "one-dimensional", "fingernail", "butterfly",
+      "perpetrate", "idyllic", "endeavor", "constrain", "gift", "grow", "standout", "windswept", "big-city", "piping",
+      "orchestra", "cocktail", "said", "urchin", "climax", "peacemaker", "sleeping", "wavelength", "skiff", "offset",
+      "interfere", "inaction", "clearing", "catholic", "deviant", "suffering", "convertible", "latch", "convincing", "folly",
+      "algae", "animation", "borrowed", "reconstructive", "looter", "missile", "making", "relive", "publicize", "snowboard",
+      "outsource", "retiree", "unimportant", "flip", "backlash", "enrich", "carriage", "ornament", "sever", "blind", "ocean",
+      "aspiring", "symbolic", "protest", "adrenaline", "conserve", "domesticated", "idol", "espresso", "contracting",
+      "academic", "latency", "rubble", "high-level", "vindictive", "congress", "at-bat", "shipyard", "investment", "volcano",
+      "prune", "consultation", "distil", "friction", "deficiency", "cove", "consortium", "iranian", "legion", "mood", "jumping",
+      "behavioral", "raspberry", "closed", "baroque", "offer", "waste", "hefty", "public", "prophecy", "spout", "churn",
+      "ambassador", "unrecognizable", "two-story", "synthesize", "occur", "formulate", "brag", "refined", "aegis", "centrist",
+      "devastated", "defuse", "scan", "hood", "ownership", "controversy", "degenerate", "racetrack", "combustion", "anova",
+      "cohesion", "prime-time", "disagreement", "campaign", "drink", "jeans", "hormone", "helpless", "graph", "ruddy", "vote",
+      "heft", "flexible", "autograph", "evolve", "reliability", "franchisee", "iced", "leak", "messaging", "imagery", "hoot",
+      "right-wing", "bridge", "confront", "pre-existing", "pocket", "scenery", "compound", "centralize", "filthy", "head",
+      "silhouette", "audacity", "thud", "disgrace", "humility", "podium", "sing", "infidel", "complacency", "imam", "ice",
+      "lebanese", "tangled", "eligibility", "midweek", "namesake", "step-by-step", "concept", "fleshy", "fathom", "stud",
+      "graphic", "dispose", "implied", "discretionary", "arcade", "dig", "faceless", "disinterested", "gravitational", "defunct",
+      "reread", "grape", "veil", "incapable", "con", "reside", "redwood", "nesting", "supplement", "franchise", "narration",
+      "medieval", "purify", "gurney", "persecution", "notation", "harsh", "iraqi", "busy", "complete", "dancing", "sole", "nude",
+      "volatile", "nourish", "mastectomy", "realistic", "croissant", "abundance", "insulated", "undue", "riverbank"
+    ];
+
+    // Function to generate a random fact or word
+    function generateRandom(type) {
+      const outputElement = document.getElementById('output');
+      const loader = document.getElementById('loader');
+
+      // Show loader and clear output
+      loader.style.display = 'block';
+      outputElement.textContent = '';
+
+      // Simulate a delay (like fetching from an API)
+      setTimeout(() => {
+        let result;
+        if (type === 'fact') {
+          result = facts[Math.floor(Math.random() * facts.length)];
+        } else if (type === 'word') {
+          result = words[Math.floor(Math.random() * words.length)];
+        }
+
+        // Display the result
+        outputElement.textContent = result;
+
+        // Hide loader
+        loader.style.display = 'none';
+      }, 500); // Simulate a 0.5-second delay
+    }
+
+    // Add event listeners to the buttons
+    document.getElementById('fact-btn').addEventListener('click', () => generateRandom('fact'));
+    document.getElementById('word-btn').addEventListener('click', () => generateRandom('word'));
+  </script>
+</body>
+</html>
